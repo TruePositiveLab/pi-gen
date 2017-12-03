@@ -9,7 +9,7 @@ cd /tmp/rerotor
 
 cmake ${REROTORNG_SRC} -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} \
     -DPRODUCTION=ON \
-    -DONLY_VIDEO=ON \
+    -DONLY_VIDEO=${ONLY_VIDEO:-ON} \
     -DCMAKE_INSTALL_PREFIX=${ROOTFS_DIR}/usr
 
 make -j4 install
