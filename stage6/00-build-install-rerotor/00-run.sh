@@ -1,4 +1,6 @@
-#/bin/bash -e
+#/bin/bash -x
+
+set -x
 
 export REROTOR_SRC=/src/retailrotor
 export REROTORNG_SRC=${REROTOR_SRC}/ReRotor-NG
@@ -15,3 +17,19 @@ cmake ${REROTORNG_SRC} -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} \
 make -j4 install
 
 install -D /opt/rpi/rootfs/usr/lib/libthrift* ${ROOTFS_DIR}/usr/lib
+
+export SYSTEMD_USER_DIR="${ROOTFS_DIR}/home/pi/.config/systemd/user/graphical-session.target.wants/"
+
+install -D ${REROTORNG_SRC}/scripts/raspberry/timecorrection.{service,timer} ${ROOTFS_DIR}/etc/systemd/system/
+install -D ${REROTORNG_SRC}/scripts/raspberry/timecorrection.sh ${ROOTFS_DIR}/usr/bin/
+
+ln -s /etc/systemd/system/timecorrection.service ${ROOTFS_DIR}/etc/systemd/system/multi-user.target.wants/timecorrection.service
+ln -s /etc/systemd/system/timecorrection.timer ${ROOTFS_DIR}/etc/systemd/system/timers.target.wants/timecorrection.timer
+
+echo "systemctl --user start rerotord" >> ${ROOTFS_DIR}/home/pi/.profile
+
+install -D ${REROTORNG_SRC}/wallpapers/${BUSINESS}.jpg ${ROOTFS_DIR}/usr/share/rpd-wallpaper
+find ${ROOTFS_DIR}/etc -type f -iname '*.conf' -exec sed -i.bak 's/road\.jpg/'${BUSINESS}'.jpg/' "{}" +;
+
+mkdir -p ${ROOTFS_DIR}/home/pi/Desktop
+install -D ${REROTORNG_SRC}/scripts/retailrotor.desktop ${ROOTFS_DIR}/home/pi/Desktop/
