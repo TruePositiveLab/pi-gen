@@ -2,6 +2,7 @@
 
 install -m 644 files/sources.list ${ROOTFS_DIR}/etc/apt/
 install -m 644 files/raspi.list ${ROOTFS_DIR}/etc/apt/sources.list.d/
+install -m 644 files/gst-omx.list ${ROOTFS_DIR}/etc/apt/sources.list.d/
 
 if [ -n "$APT_PROXY" ]; then
 	install -m 644 files/51cache ${ROOTFS_DIR}/etc/apt/apt.conf.d/51cache
@@ -12,6 +13,8 @@ fi
 
 on_chroot apt-key add - < files/raspberrypi.gpg.key
 on_chroot << EOF
+gpg --recv-key 0C667A3E
+gpg -armor --export 0C667A3E | apt-key add -
 apt-get update
 apt-get dist-upgrade -y
 EOF
